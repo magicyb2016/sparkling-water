@@ -1,12 +1,16 @@
 # Sparkling Water
 
 [![Join the chat at https://gitter.im/h2oai/sparkling-water](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/h2oai/sparkling-water?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![][license img]][license]
 [![][travis img]][travis]
 [![][maven img]][maven]
-[![][license img]][license]
 
 [travis]:https://travis-ci.org/h2oai/sparkling-water
 [travis img]:https://travis-ci.org/h2oai/sparkling-water.svg?branch=master
+[travis16 img]:https://travis-ci.org/h2oai/sparkling-water.svg?branch=rel-1.6
+[travis15 img]:https://travis-ci.org/h2oai/sparkling-water.svg?branch=rel-1.5
+[travis14 img]:https://travis-ci.org/h2oai/sparkling-water.svg?branch=rel-1.4
+[travis13 img]:https://travis-ci.org/h2oai/sparkling-water.svg?branch=rel-1.3
 
 [maven]:http://search.maven.org/#search|gav|1|g:"ai.h2o"%20AND%20a:"sparkling-water-core_2.10"
 [maven img]:https://maven-badges.herokuapp.com/maven-central/ai.h2o/sparkling-water-core_2.10/badge.svg
@@ -28,13 +32,19 @@ The Sparkling Water is developed in multiple parallel branches.
 Each branch corresponds to a Spark major release (e.g., branch **rel-1.5** provides implementation of Sparkling Water for Spark **1.5**).
 
 Please, switch to the right branch:
- - For Spark 1.6 use branch [rel-1.6](https://github.com/h2oai/sparkling-water/tree/rel-1.6)
+ - For Spark 1.6 use branch [rel-1.6](https://github.com/h2oai/sparkling-water/tree/rel-1.6) 
  - For Spark 1.5 use branch [rel-1.5](https://github.com/h2oai/sparkling-water/tree/rel-1.5)
  - For Spark 1.4 use branch [rel-1.4](https://github.com/h2oai/sparkling-water/tree/rel-1.4)
  - For Spark 1.3 use branch [rel-1.3](https://github.com/h2oai/sparkling-water/tree/rel-1.3)
+ 
 
 > Note: The [master](https://github.com/h2oai/sparkling-water/tree/master) branch includes the latest changes
 for the latest Spark version. They are back-ported into older Sparkling Water versions.
+
+#### Build status of Maven artifacts
+|master|1.6|1.5|1.4|1.3|
+|:---:|:---:|:---:|:---:|:---:|
+|[![][travis img]][travis]|[![][travis16 img]][travis]|[![][travis15 img]][travis]|[![][travis14 img]][travis]|[![][travis13 img]][travis]|
 
 <a name="Req"></a>
 ### Requirements
