@@ -33,7 +33,7 @@ class RDD2H2OFrame extends Transformer {
   @DeveloperApi
   override def transformSchema(schema: StructType): StructType = ???
 
-  override val uid: String = "rdd2h2oFram_"
+  override val uid: String = "rdd2h2oFrame_"
 
   override def copy(extra: ParamMap): Transformer = ???
 }
