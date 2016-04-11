@@ -49,7 +49,7 @@ object HamOrSpamDemo extends SparkContextSupport {
     addFiles(sc, absPath("examples/smalldata/" + DATAFILE))
     // Initialize H2O context
     implicit val h2oContext = H2OContext.getOrCreate(sc)
-    import h2oContext._
+    import h2oContext.implicits._
     // Initialize SQL context
     implicit val sqlContext = new SQLContext(sc)
     import sqlContext.implicits._
@@ -149,7 +149,7 @@ object HamOrSpamDemo extends SparkContextSupport {
                    epochs: Int = 10, l1: Double = 0.001, l2: Double = 0.0,
                    hidden: Array[Int] = Array[Int](200, 200))
                   (implicit h2oContext: H2OContext): DeepLearningModel = {
-    import h2oContext._
+    import h2oContext.implicits._
     // Build a model
     val dlParams = new DeepLearningParameters()
     dlParams._train = train
@@ -172,7 +172,7 @@ object HamOrSpamDemo extends SparkContextSupport {
              idfModel: IDFModel,
              hamThreshold: Double = 0.5)
             (implicit sqlContext: SQLContext, h2oContext: H2OContext):Boolean = {
-    import h2oContext._
+    import h2oContext.implicits._
     import sqlContext.implicits._
     val msgRdd = sc.parallelize(Seq(msg))
     val msgVector: DataFrame = idfModel.transform(
