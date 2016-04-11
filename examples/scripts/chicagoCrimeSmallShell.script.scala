@@ -20,6 +20,7 @@ import org.apache.spark.examples.h2o.{DemoUtils, Crime, RefineDateColumn}
 import org.apache.spark.h2o._
 import org.apache.spark.sql._
 import org.apache.spark.sql.types._
+import water.app.ModelMetricsSupport
 
 // Create SQL support
 implicit val sqlContext = SQLContext.getOrCreate(sc)
@@ -125,7 +126,6 @@ val keys = Array[String]("train.hex", "test.hex")
 val ratios = Array[Double](0.8, 0.2)
 val frs = splitFrame(crimeWeatherDF, keys, ratios)
 val (train, test) = (frs(0), frs(1))
-
 //
 // Show results
 //
@@ -178,17 +178,8 @@ val gbmModel = GBMModel(train, test, 'Arrest)
 //
 val dlModel = DLModel(train, test, 'Arrest)
 
-// Collect model metrics
-def binomialMetrics[M <: Model[M,P,O], P <: _root_.hex.Model.Parameters, O <: _root_.hex.Model.Output]
-(model: Model[M,P,O], train: H2OFrame, test: H2OFrame):(ModelMetricsBinomial, ModelMetricsBinomial) = {
-  import water.app.ModelMetricsSupport._
-  model.score(train).delete()
-  model.score(test).delete()
-  (binomialMM(model,train), binomialMM(model, test))
-}
-
-val (trainMetricsGBM, testMetricsGBM) = binomialMetrics(gbmModel, train, test)
-val (trainMetricsDL, testMetricsDL) = binomialMetrics(dlModel, train, test)
+val (trainMetricsGBM, testMetricsGBM) = ModelMetricsSupport[ModelMetricsBinomial].trainAndTestMetrics(gbmModel, train, test)
+val (trainMetricsDL, testMetricsDL) =  ModelMetricsSupport[ModelMetricsBinomial].trainAndTestMetrics(dlModel, train, test)
 
 //
 // Print Scores of GBM & Deep Learning

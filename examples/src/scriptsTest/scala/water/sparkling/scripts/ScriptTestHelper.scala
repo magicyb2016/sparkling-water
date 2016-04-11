@@ -33,6 +33,7 @@ trait ScriptsTestHelper extends FunSuite with org.apache.spark.Logging with Befo
     val conf = new SparkConf().setAppName("Script testing")
       .set("spark.repl.class.uri",H2OInterpreter.classServerUri)
       .set("spark.ext.h2o.repl.enabled","false") // disable repl in tests
+      .set("spark.scheduler.minRegisteredResourcesRatio","1")
       .set("spark.driver.extraJavaOptions", "-XX:MaxPermSize=384m")
       .set("spark.executor.extraJavaOptions", "-XX:MaxPermSize=384m")
       .set("spark.driver.extraClassPath", assemblyJar)

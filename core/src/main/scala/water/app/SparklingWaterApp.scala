@@ -31,7 +31,6 @@ import org.apache.spark.sql.SQLContext
 import water.fvec.Frame
 import water.persist.Persist
 import water.{AutoBuffer, H2O, Key, Keyed}
-
 /**
  * A simple application trait to define Sparkling Water applications.
  */
@@ -52,23 +51,44 @@ trait SparklingWaterApp {
 }
 
 // FIXME: should be published by h2o-scala interface
-trait ModelMetricsSupport {
+class ModelMetricsSupport[T] private() {
 
-  def r2(model: GBMModel, fr: Frame) = hex.ModelMetrics.getFromDKV(model, fr)
-    .asInstanceOf[hex.ModelMetricsSupervised].r2()
+  def metrics[M <: Model[M, P, O], P <: hex.Model.Parameters, O <: hex.Model.Output]
+  (model: Model[M, P, O], fr: Frame) = {
+    model.score(fr).delete()
+    ModelMetrics.getFromDKV(model, fr).asInstanceOf[T]
+  }
 
-  def modelMetrics[T <: ModelMetrics, M <: Model[M, P, O], P <: hex.Model.Parameters, O <: hex.Model.Output]
-  (model: Model[M, P, O], fr: Frame) = ModelMetrics.getFromDKV(model, fr).asInstanceOf[T]
+  def testMetrics[M <: Model[M, P, O], P <: hex.Model.Parameters, O <: hex.Model.Output]
+  (model: Model[M, P, O], validationFrame: Frame) = {
+    if(model._output._validation_metrics!=null){
+      model._output._validation_metrics.asInstanceOf[T]
+    }
+    else{
+      model.score(validationFrame).delete()
+      metrics[M,P,O](model,validationFrame)
+    }
+  }
+  def trainMetrics[M <: Model[M, P, O], P <: hex.Model.Parameters, O <: hex.Model.Output]
+  (model: Model[M, P, O], trainingFrame: Frame) = {
+    if(model._output._training_metrics!=null){
+      model._output._training_metrics.asInstanceOf[T]
+    }
+    else{
+      model.score(trainingFrame).delete()
+      metrics[M,P,O](model,trainingFrame)
+    }
+  }
 
-  def binomialMM[M <: Model[M, P, O], P <: hex.Model.Parameters, O <: hex.Model.Output]
-  (model: Model[M, P, O], fr: Frame) = modelMetrics[hex.ModelMetricsBinomial, M, P, O](model, fr)
-
-  def multinomialMM[M <: Model[M, P, O], P <: hex.Model.Parameters, O <: hex.Model.Output]
-  (model: Model[M, P, O], fr: Frame) = modelMetrics[hex.ModelMetricsMultinomial, M, P, O](model, fr)
+  def trainAndTestMetrics[M <: Model[M, P, O], P <: hex.Model.Parameters, O <: hex.Model.Output]
+  (model: Model[M, P, O],trainingFrame:Frame, validationFrame: Frame) = {
+    (trainMetrics(model,trainingFrame),testMetrics(model,validationFrame))
+  }
 }
 
-// Create companion object
-object ModelMetricsSupport extends ModelMetricsSupport
+object ModelMetricsSupport {
+  def apply[T<:ModelMetrics] = new ModelMetricsSupport[T]
+}
 
 trait DeepLearningSupport {
 

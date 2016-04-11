@@ -25,7 +25,7 @@ import org.apache.spark.mllib.linalg.{Vector, Vectors}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SQLContext
 import org.apache.spark.{SparkContext, mllib}
-import water.app.{GBMSupport, ModelMetricsSupport, SparkContextSupport, SparklingWaterApp}
+import water.app.{GBMSupport, SparkContextSupport, SparklingWaterApp}
 
 /**
  * This application use word2vec to build a model
@@ -35,7 +35,7 @@ class CraigslistJobTitlesApp(jobsFile: String = "examples/smalldata/craigslistJo
                             (@transient override val sc: SparkContext,
                               @transient override val sqlContext: SQLContext,
                               @transient override val h2oContext: H2OContext) extends SparklingWaterApp
-                            with SparkContextSupport with GBMSupport with ModelMetricsSupport with Serializable {
+                            with SparkContextSupport with GBMSupport with Serializable {
 
   // Import companion object methods
   import CraigslistJobTitlesApp._

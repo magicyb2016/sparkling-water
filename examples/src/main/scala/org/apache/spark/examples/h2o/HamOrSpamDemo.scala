@@ -17,6 +17,7 @@
 
 package org.apache.spark.examples.h2o
 
+import hex.ModelMetricsBinomial
 import hex.deeplearning.{DeepLearningModel, DeepLearning}
 import hex.deeplearning.DeepLearningModel.DeepLearningParameters
 import org.apache.spark.examples.h2o.DemoUtils._
@@ -33,7 +34,7 @@ import water.app.{ModelMetricsSupport, SparkContextSupport}
  * It predicts spam text messages.
  * Training dataset is available in the file smalldata/smsData.txt.
  */
-object HamOrSpamDemo extends SparkContextSupport with ModelMetricsSupport {
+object HamOrSpamDemo extends SparkContextSupport {
 
   val DATAFILE="smsData.txt"
   val TEST_MSGS = Seq(
@@ -62,7 +63,7 @@ object HamOrSpamDemo extends SparkContextSupport with ModelMetricsSupport {
     val tokens = tokenize(message)
 
     // Build IDF model
-    var (hashingTF, idfModel, tfidf) = buildIDFModel(tokens)
+    val (hashingTF, idfModel, tfidf) = buildIDFModel(tokens)
 
     // Merge response with extracted vectors
     val resultRDD: DataFrame = hamSpam.zip(tfidf).map(v => SMS(v._1, v._2)).toDF
@@ -82,8 +83,7 @@ object HamOrSpamDemo extends SparkContextSupport with ModelMetricsSupport {
     val dlModel = buildDLModel(train, valid)
 
     // Collect model metrics
-    val trainMetrics = binomialMM(dlModel, train)
-    val validMetrics = binomialMM(dlModel, valid)
+    val (trainMetrics, validMetrics) = ModelMetricsSupport[ModelMetricsBinomial].trainAndTestMetrics(dlModel, train, valid)
     println(
       s"""
          |AUC on train data = ${trainMetrics.auc}
@@ -158,16 +158,10 @@ object HamOrSpamDemo extends SparkContextSupport with ModelMetricsSupport {
     dlParams._epochs = epochs
     dlParams._l1 = l1
     dlParams._hidden = hidden
-
     // Create a job
     val dl = new DeepLearning(dlParams, water.Key.make("dlModel.hex"))
-    val dlModel = dl.trainModel.get
-
-    // Compute metrics on both datasets
-    dlModel.score(train).delete()
-    dlModel.score(valid).delete()
-
-    dlModel
+    val model = dl.trainModel().get()
+    model
   }
 
   /** Spam detector */

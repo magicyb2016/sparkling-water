@@ -14,7 +14,6 @@ import org.apache.spark.SparkFiles
 import org.apache.spark.examples.h2o.DemoUtils._
 import org.apache.spark.examples.h2o.{Crime, ChicagoCrimeApp}
 import org.apache.spark.h2o.H2OContext
-import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SQLContext
 
 // 2. Register local files

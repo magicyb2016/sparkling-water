@@ -44,8 +44,7 @@ class ChicagoCrimeApp( weatherFile: String,
                        val dateTimeZone: String = "Etc/UTC")
                      ( @transient override val sc: SparkContext,
                        @transient override val sqlContext: SQLContext,
-                       @transient override val h2oContext: H2OContext) extends SparklingWaterApp
-                      with ModelMetricsSupport {
+                       @transient override val h2oContext: H2OContext) extends SparklingWaterApp {
 
   def train(weatherTable: DataFrame, censusTable: DataFrame, crimesTable: DataFrame): (GBMModel, DeepLearningModel) = {
     // Prepare environment
@@ -94,13 +93,13 @@ class ChicagoCrimeApp( weatherFile: String,
     // Build GBM model and collect model metrics
     //
     val gbmModel = GBMModel(train, test, 'Arrest)
-    val (trainMetricsGBM, testMetricsGBM) = binomialMetrics(gbmModel, train, test)
+    val (trainMetricsGBM, testMetricsGBM) = ModelMetricsSupport[ModelMetricsBinomial].trainAndTestMetrics(gbmModel, train, test)
 
     //
     // Build Deep Learning model and collect model metrics
     //
     val dlModel = DLModel(train, test, 'Arrest)
-    val (trainMetricsDL, testMetricsDL) = binomialMetrics(dlModel, train, test)
+    val (trainMetricsDL, testMetricsDL) =  ModelMetricsSupport[ModelMetricsBinomial].trainAndTestMetrics(dlModel, train, test)
 
     //
     // Print Scores of GBM & Deep Learning
@@ -160,14 +159,6 @@ class ChicagoCrimeApp( weatherFile: String,
     val model = dl.trainModel.get
     model
   }
-
-  def binomialMetrics[M <: Model[M,P,O], P <: hex.Model.Parameters, O <: hex.Model.Output]
-                (model: Model[M,P,O], train: H2OFrame, test: H2OFrame):(ModelMetricsBinomial, ModelMetricsBinomial) = {
-    model.score(train).delete()
-    model.score(test).delete()
-    (binomialMM(model,train), binomialMM(model, test))
-  }
-
 
   /** Load all data from given 3 sources and returns Spark's DataFrame for each of them.
     *

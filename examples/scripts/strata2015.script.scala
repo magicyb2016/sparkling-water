@@ -10,6 +10,7 @@
   *    SparkContext is available as sc
   */
 // Common imports
+import _root_.hex.ModelMetricsSupervised
 import org.apache.spark.SparkFiles
 import org.apache.spark.h2o._
 import org.apache.spark.examples.h2o._
@@ -97,10 +98,11 @@ def buildModel(df: H2OFrame, trees: Int = 100, depth: Int = 6):R2 = {
     gbmParams._max_depth = depth
     // Build a model
     val gbmModel = new GBM(gbmParams).trainModel.get
-    // Score datasets
-    Seq(train,test,hold).foreach(gbmModel.score(_).delete)
     // Collect R2 metrics
-    val result = R2("Model #1", ModelMetricsSupport.r2(gbmModel, train), r2(gbmModel, test), r2(gbmModel, hold))
+    val trainR2 = ModelMetricsSupport[ModelMetricsSupervised].trainMetrics(gbmModel,train).r2()
+    val validR2 = ModelMetricsSupport[ModelMetricsSupervised].testMetrics(gbmModel,test).r2()
+    val holdR2 =  ModelMetricsSupport[ModelMetricsSupervised].metrics(gbmModel,hold).r2()
+    val result = R2("Model #1",trainR2, validR2, holdR2)
     // Perform clean-up
     Seq(train, test, hold).foreach(_.delete())
     result
