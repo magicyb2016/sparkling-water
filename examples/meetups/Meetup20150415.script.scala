@@ -15,7 +15,6 @@ val DATAFILE="examples/smalldata/smsData.txt"
 
 import hex.deeplearning.{DeepLearningModel, DeepLearning}
 import hex.deeplearning.DeepLearningModel.DeepLearningParameters
-import org.apache.spark.examples.h2o.DemoUtils._
 import org.apache.spark.h2o._
 import org.apache.spark.mllib
 import org.apache.spark.mllib.feature.{IDFModel, IDF, HashingTF}

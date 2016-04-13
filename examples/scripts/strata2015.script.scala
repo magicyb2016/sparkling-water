@@ -13,11 +13,11 @@
 import org.apache.spark.SparkFiles
 import org.apache.spark.h2o._
 import org.apache.spark.examples.h2o._
-import org.apache.spark.examples.h2o.DemoUtils._
 import org.apache.spark.sql.SQLContext
 import _root_.hex.tree.gbm.GBM
 import _root_.hex.tree.gbm.GBMModel.GBMParameters
-import water.app.ModelMetricsSupport
+import water.support.{H2OFrameSupport, SparkContextSupport, ModelMetricsSupport}
+import water.support.ModelMetricsSupport.R2
 
 // Create SQL support
 implicit val sqlContext = SQLContext.getOrCreate(sc)
@@ -33,7 +33,7 @@ val fileNames = Seq[String]("2013-07.csv","2013-08.csv","2013-09.csv","2013-10.c
 val filesPaths = fileNames.map(name => location + name) :+ location+"31081_New_York_City__Hourly_2013.csv"
 
 // Register files to SparkContext
-addFiles(sc, filesPaths:_*)
+SparkContextSupport.addFiles(sc, filesPaths:_*)
 
 // Load and parse data into H2O
 val dataFiles = fileNames.map(name => new java.io.File(SparkFiles.get(name)).toURI)
@@ -88,7 +88,7 @@ val finalBikeDF = bikesPerDayDF.add(new TimeTransform().doIt(daysVec))
 def buildModel(df: H2OFrame, trees: Int = 100, depth: Int = 6)(implicit h2oContext: H2OContext):R2 = {
     import h2oContext.implicits._
     // Split into train and test parts
-    val frs = splitFrame(df, Seq("train.hex", "test.hex", "hold.hex"), Seq(0.6, 0.3, 0.1))
+    val frs = H2OFrameSupport.splitFrame(df, Seq("train.hex", "test.hex", "hold.hex"), Seq(0.6, 0.3, 0.1))
     val (train, test, hold) = (frs(0), frs(1), frs(2))
     // Configure GBM parameters
     val gbmParams = new GBMParameters()
@@ -102,7 +102,7 @@ def buildModel(df: H2OFrame, trees: Int = 100, depth: Int = 6)(implicit h2oConte
     // Score datasets
     Seq(train,test,hold).foreach(gbmModel.score(_).delete)
     // Collect R2 metrics
-    val result = R2("Model #1", ModelMetricsSupport.r2(gbmModel, train), r2(gbmModel, test), r2(gbmModel, hold))
+    val result = R2("Model #1", ModelMetricsSupport.r2(gbmModel, train), ModelMetricsSupport.r2(gbmModel, test), ModelMetricsSupport.r2(gbmModel, hold))
     // Perform clean-up
     Seq(train, test, hold).foreach(_.delete())
     result

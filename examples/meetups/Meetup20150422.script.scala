@@ -17,7 +17,6 @@ import hex.tree.gbm.GBMModel
 import hex.tree.gbm.GBMModel.GBMParameters.Family
 import hex.{Model, ModelMetricsBinomial}
 import org.apache.spark.SparkFiles
-import org.apache.spark.examples.h2o.DemoUtils._
 import org.apache.spark.examples.h2o.{Crime, RefineDateColumn}
 import org.apache.spark.h2o._
 import org.apache.spark.sql._
@@ -122,7 +121,6 @@ val crimeWeatherDF:DataFrame = crimeWeather
 //
 // Split final data table
 //
-import org.apache.spark.examples.h2o.DemoUtils._
 val keys = Array[String]("train.hex", "test.hex")
 val ratios = Array[Double](0.8, 0.2)
 val frs = splitFrame(crimeWeatherDF, keys, ratios)

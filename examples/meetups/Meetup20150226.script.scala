@@ -6,7 +6,6 @@
 val DIR_PREFIX = "/Users/michal/Devel/projects/h2o/repos/h2o2/bigdata/laptop/citibike-nyc/"
 import org.apache.spark.h2o._
 import org.apache.spark.examples.h2o._
-import org.apache.spark.examples.h2o.DemoUtils._
 import org.apache.spark.sql.{SQLContext, SchemaRDD}
 import water.fvec._
 import hex.tree.gbm.GBMModel
