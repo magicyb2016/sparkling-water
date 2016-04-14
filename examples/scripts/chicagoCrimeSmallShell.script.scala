@@ -184,7 +184,7 @@ def binomialMetrics[M <: Model[M,P,O], P <: _root_.hex.Model.Parameters, O <: _r
   import water.app.ModelMetricsSupport._
   model.score(train).delete()
   model.score(test).delete()
-  (binomialMM(model,train), binomialMM(model, test))
+  (modelMetrics(model,train), modelMetrics(model, test))
 }
 
 val (trainMetricsGBM, testMetricsGBM) = binomialMetrics(gbmModel, train, test)
